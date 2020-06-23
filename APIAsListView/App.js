@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,33 +14,49 @@ import {
   Text,
   FlatList,
   ListView,
+  ActivityIndicator,
 } from 'react-native';
 
 const App: () => React$Node = () => {
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch('https://dog.ceo/api/breeds/list/all')
+      .then(response => response.json())
+      .then(data => {
+        let dogs = [];
+        Object.keys(data.message).forEach(breed => {
+          const dog = {
+            key: breed,
+            name: breed.charAt(0).toUpperCase() + breed.slice(1),
+            types: data.message[breed],
+          };
+          dogs.push(dog);
+        });
+        setData(dogs);
+      })
+      .catch(error => console.error(error))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <>
       <SafeAreaView>
         <View style={styles.container}>
-          <FlatList
-            data={[
-              {key: 0, initial: 'RN', name: 'Riya Narayan'},
-              {key: 1, initial: 'SN', name: 'Sana Narayan'},
-              {key: 2, initial: 'PN', name: 'Pankaj Narayan'},
-              {key: 3, initial: 'SN', name: 'Shefali Narayan'},
-              {key: 4, initial: 'MN', name: 'Mars Narayan'},
-              {key: 5, initial: 'AW', name: 'Alex Wang'},
-              {key: 6, initial: 'NM', name: 'Naviya Makhija'},
-              {key: 7, initial: 'AM', name: 'Anushree Mehta'},
-              {key: 8, initial: 'AA', name: 'Anjolie Arora'},
-              {key: 9, initial: 'SK', name: 'Samiksha Kattera'},
-            ]}
-            renderItem={({item}) => (
-              <View id={item.key} style={styles.container}>
-                <Text style={styles.initial}>{item.initial}</Text>
-                <Text style={styles.name}>{item.name}</Text>
-              </View>
-            )}
-          />
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <FlatList
+              data={data}
+              keyExtractor={(item, i) => i.toString()}
+              renderItem={({item}, i) => (
+                <View id={i} style={styles.container}>
+                  <Text style={styles.name}>{item.name}</Text>
+                </View>
+              )}
+            />
+          )}
         </View>
       </SafeAreaView>
     </>
