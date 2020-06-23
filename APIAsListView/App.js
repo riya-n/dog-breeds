@@ -10,104 +10,56 @@ import React from 'react';
 import {
   SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
+  FlatList,
+  ListView,
 } from 'react-native';
-
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
 const App: () => React$Node = () => {
   return (
     <>
-      <StatusBar barStyle="dark-content" />
       <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
+        <View style={styles.container}>
+          <FlatList
+            data={[
+              {key: 0, initial: 'RN', name: 'Riya Narayan'},
+              {key: 1, initial: 'SN', name: 'Sana Narayan'},
+              {key: 2, initial: 'PN', name: 'Pankaj Narayan'},
+              {key: 3, initial: 'SN', name: 'Shefali Narayan'},
+              {key: 4, initial: 'MN', name: 'Mars Narayan'},
+              {key: 5, initial: 'AW', name: 'Alex Wang'},
+              {key: 6, initial: 'NM', name: 'Naviya Makhija'},
+              {key: 7, initial: 'AM', name: 'Anushree Mehta'},
+              {key: 8, initial: 'AA', name: 'Anjolie Arora'},
+              {key: 9, initial: 'SK', name: 'Samiksha Kattera'},
+            ]}
+            renderItem={({item}) => (
+              <View id={item.key} style={styles.container}>
+                <Text style={styles.initial}>{item.initial}</Text>
+                <Text style={styles.name}>{item.name}</Text>
+              </View>
+            )}
+          />
+        </View>
       </SafeAreaView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container: {
+    padding: 10,
+    paddingTop: 20,
+    flexDirection: 'row',
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  initial: {
+    paddingRight: 10,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  name: {
+    fontSize: 20,
   },
 });
 
