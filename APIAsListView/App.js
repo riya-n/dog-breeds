@@ -6,6 +6,7 @@
  * @flow strict-local
  */
 
+import 'react-native-gesture-handler';
 import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
@@ -16,14 +17,14 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
-const App: () => React$Node = () => {
+function HomeScreen({navigation}) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [url, setUrl] = useState(
-    'https://images.dog.ceo/breeds/retriever-golden/n02099601_5051.jpg',
-  );
-  const [dogName, setDogName] = useState('Retriever');
+  const url =
+    'https://images.dog.ceo/breeds/retriever-golden/n02099601_5051.jpg';
 
   useEffect(() => {
     fetch('https://dog.ceo/api/breeds/list/all')
@@ -68,30 +69,13 @@ const App: () => React$Node = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  function fetchDogImage(breed, name) {
-    fetch('https://dog.ceo/api/breed/' + breed + '/images/random')
-      .then(response => response.json())
-      .then(json => {
-        console.log('imageurl', json.message);
-        setUrl(json.message);
-        setDogName(name);
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  }
-
   return (
     <>
       <SafeAreaView>
-        <Text style={styles.title}>Random {dogName} Dog Image</Text>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={{uri: url}} />
         </View>
         <Text style={styles.title}>List of Dog Breeds</Text>
-        <Text style={styles.subtitle}>
-          Choose from the list below to change the image.
-        </Text>
         <View style={styles.listContainer}>
           {isLoading ? (
             <ActivityIndicator />
@@ -99,13 +83,18 @@ const App: () => React$Node = () => {
             <SectionList
               sections={data}
               renderItem={({item}, i) => (
-                <View
-                  id={i}
-                  style={styles.container}
-                  onStartShouldSetResponder={() =>
-                    fetchDogImage(item.key, item.name)
-                  }>
+                <View id={i} style={styles.container}>
                   <Text style={styles.name}>{item.name}</Text>
+                  <Text
+                    style={styles.details}
+                    onStartShouldSetResponder={() =>
+                      navigation.push('Details', {
+                        dogBreed: item.key,
+                        dogName: item.name,
+                      })
+                    }>
+                    Details
+                  </Text>
                 </View>
               )}
               renderSectionHeader={({section}) => (
@@ -117,6 +106,52 @@ const App: () => React$Node = () => {
         </View>
       </SafeAreaView>
     </>
+  );
+}
+
+function DetailsScreen({route, navigation}) {
+  const {dogBreed, dogName} = route.params;
+  const [isLoading, setLoading] = useState(true);
+  const [url, setUrl] = useState();
+
+  useEffect(() => {
+    fetch('https://dog.ceo/api/breed/' + dogBreed + '/images/random')
+      .then(response => response.json())
+      .then(json => {
+        setUrl(json.message);
+      })
+      .catch(error => {
+        console.error(error);
+      })
+      .finally(() => setLoading(false));
+  }, [dogBreed]);
+
+  return (
+    <>
+      <SafeAreaView>
+        <Text style={styles.title}>Random {dogName} Dog Image</Text>
+        <View style={styles.imageContainer}>
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <Image style={styles.image} source={{uri: url}} />
+          )}
+        </View>
+      </SafeAreaView>
+    </>
+  );
+}
+
+const Stack = createStackNavigator();
+
+const App: () => React$Node = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
@@ -140,6 +175,13 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     height: 30,
+  },
+  details: {
+    color: '#8FBC8F',
+    fontSize: 14,
+    alignSelf: 'center',
+    position: 'absolute',
+    right: 10,
   },
   heading: {
     paddingTop: 5,
