@@ -16,6 +16,7 @@ import {
   SectionList,
   ActivityIndicator,
   Image,
+  TextInput,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -23,26 +24,31 @@ import {createStackNavigator} from '@react-navigation/stack';
 function HomeScreen({navigation}) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [addedData, setAddedData] = useState([]);
+  const [text, setText] = useState('');
+
   const url =
     'https://images.dog.ceo/breeds/retriever-golden/n02099601_5051.jpg';
 
   useEffect(() => {
+    let dogs = [];
+
+    /** Add the dog breeds entered by the user */
+    const addedSection = {
+      heading: 'Added By Me',
+      data: addedData,
+    };
+    dogs.push(addedSection);
+
+    /** Add the dog breeds returned from the API */
     fetch('https://dog.ceo/api/breeds/list/all')
       .then(response => response.json())
       .then(json => {
-        let dogs = [];
         let currDogs = [];
         let curr = 'A';
         Object.keys(json.message).forEach(breed => {
           const name = breed.charAt(0).toUpperCase() + breed.slice(1);
-          if (name.charAt(0) === curr) {
-            const breedData = {
-              key: breed,
-              name: name,
-              types: json.message[breed],
-            };
-            currDogs.push(breedData);
-          } else {
+          if (name.charAt(0) !== curr) {
             const section = {
               heading: curr,
               data: currDogs,
@@ -50,13 +56,14 @@ function HomeScreen({navigation}) {
             dogs.push(section);
             curr = name.charAt(0);
             currDogs = [];
-            const breedData = {
-              key: breed,
-              name: name,
-              types: json.message[breed],
-            };
-            currDogs.push(breedData);
           }
+          const breedData = {
+            key: breed,
+            name: name,
+            types: json.message[breed],
+            fromApi: true,
+          };
+          currDogs.push(breedData);
         });
         const section = {
           heading: curr,
@@ -67,7 +74,20 @@ function HomeScreen({navigation}) {
       })
       .catch(error => console.error(error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [addedData]);
+
+  function addDogBreed() {
+    let currDogs = addedData;
+    const breedData = {
+      key: 'mybreed' + currDogs.length,
+      name: text,
+      types: [],
+      fromApi: false,
+    };
+    currDogs.push(breedData);
+    setAddedData(currDogs);
+    setText('');
+  }
 
   return (
     <>
@@ -76,25 +96,38 @@ function HomeScreen({navigation}) {
           <Image style={styles.image} source={{uri: url}} />
         </View>
         <Text style={styles.title}>List of Dog Breeds</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={value => setText(value)}
+          onSubmitEditing={() => addDogBreed()}
+          value={text}
+          placeholder="Enter more dog breeds here..."
+        />
         <View style={styles.listContainer}>
           {isLoading ? (
             <ActivityIndicator />
           ) : (
             <SectionList
               sections={data}
-              renderItem={({item}, i) => (
-                <View id={i} style={styles.container}>
+              renderItem={({item}) => (
+                <View id={item.key} style={styles.container}>
                   <Text style={styles.name}>{item.name}</Text>
-                  <Text
-                    style={styles.details}
-                    onStartShouldSetResponder={() =>
-                      navigation.push('Details', {
-                        dogBreed: item.key,
-                        dogName: item.name,
-                      })
-                    }>
-                    Details
-                  </Text>
+                  {console.log('item', item)}
+                  {item.fromApi === true ? (
+                    <Text
+                      style={styles.details}
+                      onStartShouldSetResponder={() =>
+                        navigation.push('Details', {
+                          dogBreed: item.key,
+                          dogName: item.name,
+                          dogImage: item.image,
+                        })
+                      }>
+                      Details
+                    </Text>
+                  ) : (
+                    <Text />
+                  )}
                 </View>
               )}
               renderSectionHeader={({section}) => (
@@ -166,11 +199,20 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
   subtitle: {
     textAlign: 'center',
     paddingTop: 5,
     fontSize: 14,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gainsboro',
+    borderWidth: 1,
+    marginRight: 20,
+    marginLeft: 20,
+    padding: 10,
   },
   name: {
     fontSize: 18,
