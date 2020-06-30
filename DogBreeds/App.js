@@ -244,11 +244,11 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 20,
     flexDirection: 'row',
-    height: 400, // TODO: make this dynamic (for different screen sizes)
+    height: 400, // TODO(issue/4)
   },
   image: {
     width: 300,
-    height: 300, // TODO: make this dynamic (for different screen sizes)
+    height: 300, // TODO(issue/4)
   },
 });
 
