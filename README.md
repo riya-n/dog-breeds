@@ -1,7 +1,3 @@
-# My React Native Projects
+# Dog Breeds
 
-I'm learning react native! This repo contains some projects I am working on to help me learn the basic concepts of the framework.
-
-## Dog Breeds
-
-Scroll through a list of dog breeds and click on one to see a random image of that breed! I created this app to learn how to use an API and also get familiar with list views. Now I'm working on adding more features to it using text inputs, react navigation, etc.
+I'm learning react native! In order to learn the basic concepts of the framework, I decided to create an app that shows a list of dog breeds. You can scroll through a list of dog breeds and click on one to see a random image of that breed! You can also add your own dog breeds to the list. I created this app to learn how to use an API, get familiar with list views, and also learn how to use react navigation.
