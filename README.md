@@ -4,8 +4,8 @@ I'm learning react native! In order to learn the basic concepts of the framework
 
 Feature to see a random dog image:
 
-<img src="homepage.gif" height="500">
+<img src="detailspage.gif" height="500">
 
 Feature to add your own breed:
 
-<img src="detailspage.gif" height="500">
+<img src="homepage.gif" height="500">
